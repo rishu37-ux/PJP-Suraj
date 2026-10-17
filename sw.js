@@ -1,5 +1,5 @@
 // Offline cache so the app opens without internet after the first visit.
-const CACHE='pjp-suraj-v1';
+const CACHE='pjp-suraj-v2';
 const FILES=['./','index.html','local-backend.js','vendor/xlsx.min.js','manifest.webmanifest','icon.svg','icon-192.png','icon-512.png'];
 
 self.addEventListener('install',e=>{
