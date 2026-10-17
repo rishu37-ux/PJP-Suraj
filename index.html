@@ -763,7 +763,7 @@ function restoreBackup_(input){
     alert('Backup restored.');
   }).catch(e=>alert('Restore failed: '+e.message));
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 init();
 </script>
 </body>

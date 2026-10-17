@@ -1,5 +1,5 @@
 // Offline cache so the app opens without internet after the first visit.
-const CACHE='pjp-suraj-v2';
+const CACHE='pjp-suraj-v3';
 const FILES=['./','index.html','local-backend.js','vendor/xlsx.min.js','manifest.webmanifest','icon.svg','icon-192.png','icon-512.png'];
 
 self.addEventListener('install',e=>{
@@ -12,7 +12,8 @@ self.addEventListener('activate',e=>{
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET') return;
   e.respondWith(
-    fetch(e.request).then(res=>{
+    // no-cache: always revalidate with the server so a new deploy shows up on the next open.
+    fetch(e.request,{cache:'no-cache'}).then(res=>{
       const copy=res.clone();
       caches.open(CACHE).then(c=>c.put(e.request,copy));
       return res;
