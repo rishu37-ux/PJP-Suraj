@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f7fb;color:#172033}
+.top{background:#12355b;color:#fff;padding:16px;position:sticky;top:0;z-index:10}.title{font-size:20px;font-weight:700}.sub{font-size:12px;opacity:.85;margin-top:3px}
+.wrap{max-width:900px;margin:auto;padding:12px}.profileInline{display:flex;align-items:center;gap:5px;flex-wrap:wrap}.profileInline input{width:auto;height:28px;padding:4px 8px;border-radius:7px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.10);color:#fff;font-size:12px;outline:none}.profileInline input::placeholder{color:rgba(255,255,255,.65)}.profileInline .idLabel{margin-left:4px}.profileSaveState{font-size:10px;color:#bfe3ff;min-width:34px}.profileBtn{background:#e8eef6;color:#12355b;border:1px solid #d7e1ed}.toolbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+select,button,input{width:100%;padding:11px;border-radius:9px;border:1px solid #ccd5e2;font-size:14px}button{background:#12355b;color:#fff;border:0;font-weight:700}.secondary{background:#e8eef6;color:#12355b}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 1px 5px #d9e0ea}.num{font-size:22px;font-weight:800}.lab{font-size:11px;color:#68758a}
+.calendar{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 5px #d9e0ea}.row{display:grid;grid-template-columns:62px 70px 1fr 105px;gap:0;border-bottom:1px solid #e7ebf1;align-items:center;min-height:58px}.row>div{padding:8px}.date{font-weight:700}.day{font-size:12px;color:#68758a}
+.holiday{background:#d93025 !important;color:#fff !important;border:2px solid #b71c1c !important;border-radius:0}.holiday>div{background:#d93025 !important;color:#fff !important}.holiday .muted{color:#fff !important}.holiday button{background:#fff !important;color:#b71c1c !important;border:0 !important}.visit-text{font-size:13px;font-weight:600}.muted{font-size:12px;color:#8792a5}.actions{display:flex;gap:5px}.actions button{padding:8px 6px;font-size:11px}
+.summary{margin-top:12px;background:#fff;border-radius:12px;padding:12px;box-shadow:0 1px 5px #d9e0ea}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px;border:1px solid #777;font-size:13px}th{background:#d9d9d9;font-weight:700}tbody td{background:#d9d9d9}
+/* Elegant modal */
+.modal{position:fixed;inset:0;background:rgba(9,20,38,.66);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:9999;padding:12px;overflow:auto}.modal.open{display:flex}
+.box{background:#fff;padding:0;border:1px solid rgba(255,255,255,.65);border-radius:24px;width:100%;max-width:590px;max-height:94vh;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.28);position:relative}
+.modalHead{padding:14px 17px 11px;background:linear-gradient(135deg,#12355b 0%,#1d4f80 100%);color:#fff;position:relative}.modalHead h3{margin:0;font-size:18px;letter-spacing:-.2px}.modalHead .msg{margin:3px 34px 0 0;color:rgba(255,255,255,.78);font-size:11px;line-height:1.35}.modalClose{position:absolute;right:11px;top:10px;width:32px;height:32px;border-radius:50%;padding:0;background:rgba(255,255,255,.13);color:#fff;font-size:20px;line-height:30px;border:1px solid rgba(255,255,255,.2)}
+.modalBody{padding:13px 16px 15px;overflow:auto;max-height:calc(88vh - 68px);overscroll-behavior:contain}.bulkFixedControls{position:sticky;top:-13px;z-index:30;background:#fff;padding:13px 0 8px;margin:-13px 0 0;border-bottom:1px solid #e3e9f0;box-shadow:0 5px 12px rgba(18,53,91,.06)}.bulkFixedControls .field{margin-bottom:7px}.bulkFixedControls .field:last-child{margin-bottom:0}.bulkFixedLabel{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.bulkFixedBadge{font-size:9px;font-weight:800;color:#1769aa;background:#edf6ff;border:1px solid #cfe5f8;padding:3px 7px;border-radius:999px}.fieldLabel{display:block;font-size:11px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#68758a;margin:0 0 7px}.box select,.box input{height:42px;border:1px solid #d6deea;border-radius:13px;background:#fbfcfe;padding:0 14px;outline:none;transition:.18s;box-shadow:inset 0 1px 2px rgba(16,35,60,.03)}.box select:focus,.box input:focus{border-color:#2b669c;box-shadow:0 0 0 4px rgba(43,102,156,.10);background:#fff}.field{margin-bottom:9px}.hint{font-size:10px;color:#8490a3;margin:-3px 0 9px 2px}
+.batchTools{display:grid;grid-template-columns:1fr 92px;gap:7px;margin-bottom:7px}.batchClear{height:32px!important;border-radius:10px!important;padding:0 10px!important;background:#fff!important;color:#b42318!important;border:1px solid #efc1c1!important;font-size:11px!important}.bulkActions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:7px 0 9px}.bulkActions button{height:38px;border-radius:12px;background:#eef3f9;color:#153b62;border:1px solid #dce5f0;box-shadow:none}.bulkActions button:active{transform:translateY(1px)}.clearSavedBtn{height:36px!important;margin:0 0 9px;border-radius:11px!important;background:#fff5f5!important;color:#b42318!important;border:1px solid #efc1c1!important;font-size:11px!important;box-shadow:none!important}.clearSavedBtn:active{transform:translateY(1px)}
+.selectionHint{margin:8px 2px 0;color:#7a8799;font-size:11px;line-height:1.4;padding:0 2px}
+ .datePanel{border:1px solid #d8e2ee;border-radius:18px;background:#f6f9fc;overflow:hidden;box-shadow:0 10px 25px rgba(20,45,75,.06)}
+.datePanelHead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:linear-gradient(180deg,#f8fbff,#eef4f9);border-bottom:1px solid #dce5ef;font-size:11px;font-weight:800;color:#607086;text-transform:uppercase;letter-spacing:.65px}
+#bulkSelectedCount{background:#12355b;color:#fff;border-radius:999px;padding:5px 9px;font-size:10px;letter-spacing:.2px}
+ .dateList{padding:8px;background:#f6f9fc;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;overflow:visible;max-height:none}
+.weekHead{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;padding:7px 8px 5px;background:#eef4f9;border-bottom:1px solid #dce5ef}.weekHead span{text-align:center;font-size:9px;font-weight:800;color:#65748a;letter-spacing:.3px}.calendarDay{min-width:0;min-height:58px;border:1px solid #e1e7ef;border-radius:10px;background:#fff;padding:5px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;cursor:pointer;position:relative;box-shadow:0 1px 3px rgba(18,53,91,.035);transition:.12s}.calendarDay:active{transform:scale(.97)}.calendarDay .calNum{font-size:13px;font-weight:850;color:#173653;line-height:1}.calendarDay .calDow{font-size:7px;color:#8792a5;margin-top:3px}.calendarDay .calPlace{width:100%;margin-top:4px;font-size:8px;font-weight:750;line-height:1.1;color:#2b669c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}.calendarDay .calCheck{position:absolute;right:3px;top:3px;width:13px;height:13px;margin:0;accent-color:#1769aa}.calendarDay.selected{border:2px solid #1769aa;background:#edf6ff;box-shadow:0 3px 8px rgba(23,105,170,.13)}.calendarDay.selected .calNum{color:#0b4d80}.calendarDay.holidayItem{background:#d93025;border-color:#b71c1c;color:#fff;cursor:not-allowed}.calendarDay.holidayItem .calNum,.calendarDay.holidayItem .calDow,.calendarDay.holidayItem .calPlace{color:#fff}.calendarDay.occupiedItem{background:#eef1f5;border-color:#d2d9e2;cursor:default}.calendarDay.occupiedItem .calNum{color:#596579}.calendarDay .calEdit{margin-top:4px;width:100%!important;height:20px!important;padding:0 3px!important;border-radius:6px!important;background:#fff!important;color:#12355b!important;border:1px solid #cbd6e3!important;font-size:7px!important;box-shadow:none!important}.calendarDay.blank{background:transparent;border:0;box-shadow:none;cursor:default;min-height:58px}.calendarLegend{display:flex;gap:8px;flex-wrap:wrap;padding:6px 8px 2px;font-size:8px;color:#738197}.calendarLegend span{display:inline-flex;align-items:center;gap:4px}.calendarLegend i{width:9px;height:9px;border-radius:3px;display:inline-block;border:1px solid #d4dce6}.calendarLegend .lSelected{background:#edf6ff;border-color:#1769aa}.calendarLegend .lSaved{background:#eef1f5}.calendarLegend .lHoliday{background:#d93025;border-color:#b71c1c}
+.dateBadge{background:#e4e8ee;color:#5e6a7b}.dateItem.occupiedItem .dateTitle,.dateItem.occupiedItem .dateSub{color:#667085}.dateItem.occupiedItem .dateCheck:disabled{accent-color:#98a2b3}
+.dateBadge{width:34px;height:34px;border-radius:10px;background:#edf3f9;color:#12355b;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;line-height:1;box-shadow:inset 0 0 0 1px rgba(18,53,91,.04)}
+.dateBadge small{font-size:8px;margin-top:3px;opacity:.7;font-weight:700}
+.dateItem.selected .dateBadge{background:#12355b;color:#fff}
+.dateItem.holidayItem .dateBadge{background:#d93025;color:#fff}
+.dateInfo{min-width:0}
+.dateTitle{display:block;font-size:12px;font-weight:750;color:#172033;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dateSub{display:block;font-size:10px;color:#8792a5;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dateItem.selected .dateSub{color:#2b669c;font-weight:650}
+.dateItem.holidayItem .dateTitle,.dateItem.holidayItem .dateSub{color:#b42318}
+.dateCheck{width:18px;height:18px;accent-color:#1769aa;margin:0;justify-self:end}
+.dateCheck:disabled{accent-color:#98a2b3}.occupiedEdit{width:auto!important;min-width:46px;height:28px!important;padding:0 8px!important;border-radius:8px!important;background:#fff!important;color:#12355b!important;border:1px solid #cfd9e5!important;font-size:10px!important;box-shadow:none!important}.occupiedEdit:active{transform:translateY(1px)}.optionalTag{display:inline-block;font-size:8px;letter-spacing:.5px;padding:2px 5px;border-radius:999px;background:#eef3f8;color:#68758a;vertical-align:middle}.profileHint{font-size:11px;color:#7a8798;background:#f6f8fb;border:1px solid #e3e8ef;border-radius:10px;padding:8px 10px;margin-top:2px}
+.modalFooter{padding-top:9px;display:grid;grid-template-columns:1fr 1fr;gap:7px}.modalFooter .primaryAction{height:42px;border-radius:13px;background:linear-gradient(135deg,#12355b,#1d5c91);box-shadow:0 7px 16px rgba(18,53,91,.20)}.modalFooter .cancelAction{height:42px;border-radius:13px;background:#f1f3f6;color:#445064;border:1px solid #e0e5eb}.loading{padding:25px;text-align:center;color:#68758a} .batchPlaces{display:flex;gap:6px;flex-wrap:wrap;margin:7px 0 8px}.batchPlaceChip{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;border:1px solid #d5dfeb;background:#fff;color:#29415d;font-size:10px;font-weight:750;cursor:pointer}.batchPlaceChip.active{background:#12355b;color:#fff;border-color:#12355b}.batchPlaceChip b{background:rgba(255,255,255,.18);border-radius:999px;padding:1px 5px;font-size:9px}.batchPlaceChip:not(.active) b{background:#e9f0f7;color:#12355b}.batchPlaceHint{font-size:10px;color:#7b8798;margin:2px 0 7px}.batchAdd{height:32px!important;border-radius:10px!important;padding:0 10px!important;background:#eaf1f8!important;color:#12355b!important;border:1px solid #d8e3ef!important;font-size:11px!important}.assignmentSummary{margin-top:8px;border:1px solid #dfe6ef;border-radius:12px;background:#f8fafc;padding:7px 9px}.assignmentTitle{font-size:9px;text-transform:uppercase;letter-spacing:.7px;font-weight:800;color:#7a8798;margin-bottom:4px}.assignmentRow{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#24364d;padding:3px 0;border-top:1px solid #edf1f5}.assignmentRow:first-of-type{border-top:0}.assignmentRow b{font-size:10px;color:#12355b;background:#e8f0f8;border-radius:999px;padding:2px 7px}
+@media(min-width:650px){.row{grid-template-columns:80px 90px 1fr 130px}}
+@media(max-width:650px){.profileInline input{max-width:105px}.profileInline .idLabel{margin-left:2px}.toolbar{grid-template-columns:1fr 1fr}.toolbar button:last-child{grid-column:span 2}.modal{align-items:flex-end;padding:0}.box{max-width:none;width:100%;border-radius:18px 18px 0 0;max-height:90vh}.modalBody{max-height:calc(90vh - 67px);padding:12px 14px 13px}.bulkFixedControls{top:-12px;padding-top:12px}.dateList{max-height:205px}.datePanelHead{padding:8px 10px}.selectionHint{font-size:10px;padding:6px 8px}.modalFooter{position:sticky;bottom:0;background:#fff;padding-top:8px;padding-bottom:2px}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="title">PJP Visit Calendar</div>
+  <div class="sub profileInline">
+  <span>Name:</span><input id="topNameInput" value="SURAJ" aria-label="Employee name" onkeydown="if(event.key==='Enter')saveInlineProfile_()" onblur="saveInlineProfile_()">
+  <span class="idLabel">Employee ID:</span><input id="topEmployeeIdInput" placeholder="Optional" aria-label="Employee ID" onkeydown="if(event.key==='Enter')saveInlineProfile_()" onblur="saveInlineProfile_()">
+  <span id="profileSaveState" class="profileSaveState"></span>
+</div>
+</div>
+
+<div class="wrap">
+  <div class="toolbar">
+    <select id="month"></select>
+    <select id="year"></select>
+    <button onclick="load(true)">Refresh</button>
+    <button onclick="openBulkVisit()">Multi-Date Visit</button>
+    <button onclick="exportXlsx()">Export Excel</button>
+  </div>
+
+  <div class="cards">
+    <div class="card"><div class="num" id="total">0</div><div class="lab">TOTAL DAYS</div></div>
+    <div class="card"><div class="num" id="working">0</div><div class="lab">WORKING DAYS</div></div>
+    <div class="card"><div class="num" id="holidays">0</div><div class="lab">HOLIDAYS</div></div>
+    <div class="card"><div class="num" id="visits">0</div><div class="lab">VISIT DAYS</div></div>
+  </div>
+
+  <div class="calendar">
+    <div id="rows" class="loading">Loading calendar...</div>
+  </div>
+
+  <div class="summary">
+    <h3>Place-wise Visit Summary</h3>
+    <table>
+      <thead><tr><th>Place</th><th>Days</th><th>No of Counter</th></tr></thead>
+      <tbody id="summary"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal" id="visitModal">
+  <div class="box">
+    <div class="modalHead">
+      <button type="button" class="modalClose" onclick="closeVisit()" aria-label="Close">×</button>
+      <h3>Fill Visit</h3>
+      <div class="msg" id="visitDate"></div>
+    </div>
+    <div class="modalBody">
+      <div class="field"><label class="fieldLabel">Place</label><select id="placeSelect" onchange="placeSelectChanged()"><option value="">Select Place</option></select></div>
+      <div class="field"><input id="placeManual" placeholder="Or enter a new / manual place name"></div>
+      <div class="hint">You can select a listed place OR type a new place manually.</div>
+      <div class="field"><label class="fieldLabel">Remarks</label><input id="remarks" placeholder="Remarks (optional)"></div>
+      <div class="modalFooter"><button type="button" class="cancelAction" onclick="closeVisit()">Cancel</button><button type="button" class="primaryAction" onclick="saveVisit()">Save Visit</button></div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" id="profileModal">
+  <div class="box profileBox">
+    <div class="modalHead">
+      <button type="button" class="modalClose" onclick="closeProfile()" aria-label="Close">×</button>
+      <h3>Employee Profile</h3>
+      <div class="msg">Update your display name and optional employee ID.</div>
+    </div>
+    <div class="modalBody">
+      <div class="field"><label class="fieldLabel">Name</label><input id="profileName" placeholder="Enter name"></div>
+      <div class="field"><label class="fieldLabel">Employee ID <span class="optionalTag">OPTIONAL</span></label><input id="profileEmployeeId" placeholder="Enter employee ID (optional)"></div>
+      <div class="profileHint">Employee ID is optional. You can leave it blank.</div>
+      <div class="modalFooter"><button type="button" class="cancelAction" onclick="closeProfile()">Cancel</button><button type="button" class="primaryAction" onclick="saveProfile()">Save Profile</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="bulkModal">
+  <div class="box">
+    <div class="modalHead">
+      <button type="button" class="modalClose" onclick="closeBulkVisit()" aria-label="Close">×</button>
+      <h3>Multi-Date Visit</h3>
+      <div class="msg">Select one place and add it to multiple working dates in the current month.</div>
+    </div>
+    <div class="modalBody">
+      <div class="bulkFixedControls">
+        <div class="field"><div class="bulkFixedLabel"><label class="fieldLabel" style="margin:0">Place for current selection</label><span class="bulkFixedBadge">FIXED WHILE SCROLLING</span></div><select id="bulkPlaceSelect" onchange="bulkPlaceChanged()"></select></div>
+        <div class="field"><input id="bulkPlaceManual" placeholder="Or enter a new / manual place name" onchange="bulkManualPlaceChanged()"></div>
+      </div>
+      <div class="batchTools"><button type="button" class="batchAdd" onclick="addCurrentPlaceToBatch_()">＋ Add / Keep This Place</button><button type="button" class="batchClear" onclick="clearAllBulkAssignments_()">Clear All</button></div>
+      <div class="batchPlaceHint">Select dates, change the place, select its dates, and continue. Everything stays in this one window until Save All.</div>
+      <div id="bulkPlaceChips" class="batchPlaces"></div>
+      <div class="fieldLabel">Select Dates</div>
+      <div class="bulkActions"><button type="button" onclick="selectAllBulkDates()">✓ Select All Working</button><button type="button" onclick="clearBulkDates()">Clear Selection</button></div><button type="button" class="clearSavedBtn" onclick="clearAllSavedVisits_()">🗑 Clear All Saved Visits (This Month)</button>
+      <div class="datePanel">
+        <div class="datePanelHead"><span>Monthly Calendar</span><span id="bulkSelectedCount">0 selected</span></div>
+        <div class="weekHead"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+        <div id="bulkDates" class="dateList"><div class="loading" style="grid-column:1/-1">Loading calendar...</div></div>
+        <div class="calendarLegend"><span><i class="lSelected"></i>Selected</span><span><i class="lSaved"></i>Saved</span><span><i class="lHoliday"></i>Holiday</span></div>
+      </div>
+      <div class="selectionHint" id="bulkSelectionHint">Select dates for this place. You can switch places without saving.</div>
+      <div id="bulkAssignmentSummary" class="assignmentSummary"></div>
+      <div class="field" style="margin-top:14px"><label class="fieldLabel">Remarks</label><input id="bulkRemarks" placeholder="Optional remarks for these visits"></div>
+      <div class="modalFooter"><button type="button" class="cancelAction" onclick="closeBulkVisit()">Cancel</button><button type="button" class="primaryAction" onclick="saveBulkVisit()">Save All Visits</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="holidayModal">
+  <div class="box">
+    <div class="modalHead">
+      <button type="button" class="modalClose" onclick="closeHoliday()" aria-label="Close">×</button>
+      <h3>Mark Holiday</h3>
+      <div class="msg" id="holidayDate"></div>
+    </div>
+    <div class="modalBody">
+      <div class="field"><label class="fieldLabel">Reason</label><input id="reason" placeholder="Holiday reason, e.g. Dussehra"></div>
+      <div class="modalFooter"><button type="button" class="cancelAction" onclick="closeHoliday()">Cancel</button><button type="button" class="primaryAction" onclick="confirmHoliday()">Mark Holiday</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedVisitDate='', selectedHolidayDate='', inlineProfileTimer_=null;
+const monthCache={};
+const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const predefinedPlaces=['Barmana','Sundernagar','Dehar-Bhager','Kullu','Pandoh- Aut','Kotli','Rewalsar','Baldwara-Jahu','Nihri','Karsog','Thunag-Janjehli','Ratti-Galma-Kalkhar','Joginder Nagar','Sarkaghat','Gohar','Chailchowk','Padhar','Mandi'];
+
+function init(){
+  const now=new Date(), y=now.getFullYear();
+  document.getElementById('month').innerHTML=months.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+  document.getElementById('year').innerHTML=Array.from({length:10},(_,i)=>`<option>${y-3+i}</option>`).join('');
+  document.getElementById('month').value=now.getMonth()+1;
+  document.getElementById('year').value=y;
+  load();
+}
+
+function load(force){
+  const y=+document.getElementById('year').value,m=+document.getElementById('month').value;
+  const key=y+'-'+m;
+  if(monthCache[key] && !force){ render(monthCache[key]); return; }
+  rows.innerHTML='<div class="loading">Loading calendar...</div>';
+  google.script.run
+    .withSuccessHandler(data=>{monthCache[key]=data;render(data);})
+    .withFailureHandler(e=>alert(e.message))
+    .getMonthData(y,m);
+}
+
+function render(data){
+  rows.innerHTML=data.days.map(r=>{
+    if(r.isHoliday){
+      return `<div class="row holiday">
+        <div class="date">${r.dayNumber}</div>
+        <div class="day">${r.day.slice(0,3)}</div>
+        <div><div class="visit-text">HOLIDAY</div><div class="muted">${esc(r.holidayReason)}</div></div>
+        <div class="actions">${r.holidayReason!=='Sunday'?`<button class="secondary" onclick="unholiday('${r.date}')">Remove</button>`:'<span class="muted">Sunday</span>'}</div>
+      </div>`;
+    }
+    const filled=r.place ? `<div class="visit-text">${esc(r.place)}</div><div class="muted">${esc(r.remarks)}</div>` :
+      `<div class="muted">No visit entered</div>`;
+    return `<div class="row">
+      <div class="date">${r.dayNumber}</div>
+      <div class="day">${r.day.slice(0,3)}</div>
+      <div>${filled}</div>
+      <div class="actions">
+        <button onclick='openVisit(${JSON.stringify(r.date)},${JSON.stringify(r.place||"")},${JSON.stringify(r.remarks||"")})'>${r.place?'Edit':'Fill Visit'}</button>
+        <button class="secondary" onclick="openHoliday('${r.date}')">Holiday</button>
+      </div>
+    </div>`;
+  }).join('');
+  showSummary(data.summary);
+  const nameEl=document.getElementById('name'); if(nameEl) nameEl.textContent=data.name||'SURAJ';
+  const eidTop=document.getElementById('employeeIdTop'); if(eidTop) eidTop.textContent=data.employeeId ? '• ID: '+data.employeeId : '';
+  const topName=document.getElementById('topNameInput'); if(topName) topName.value=data.name||'SURAJ';
+  const topEmp=document.getElementById('topEmployeeIdInput'); if(topEmp) topEmp.value=data.employeeId||'';
+}
+
+
+function showModal(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.classList.add('open');
+  el.style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function hideModal(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.classList.remove('open');
+  el.style.display='none';
+  document.body.style.overflow='';
+}
+
+function openBulkVisit(){
+  const y=+document.getElementById('year').value;
+  const m=+document.getElementById('month').value;
+  const key=y+'-'+m;
+
+  populateBulkPlaceDropdown('');
+  bulkAssignments={};
+  bulkAssignmentNames={};
+  bulkSelectedPlace='';
+  const chips=document.getElementById('bulkPlaceChips'); if(chips) chips.innerHTML='';
+
+  const renderReady=(data)=>{
+    monthCache[key]=data;
+    renderBulkDates(data);
+    document.getElementById('bulkRemarks').value='';
+    showModal('bulkModal');
+  };
+
+  if(monthCache[key]){
+    renderReady(monthCache[key]);
+  }else{
+    showModal('bulkModal');
+    document.getElementById('bulkDates').innerHTML='<div class="loading">Loading dates...</div>';
+    google.script.run
+      .withSuccessHandler(renderReady)
+      .withFailureHandler(e=>{
+        hideModal('bulkModal');
+        alert('Could not load dates: '+e.message);
+      })
+      .getMonthData(y,m);
+  }
+}
+let bulkData=null;
+let bulkSelectedPlace='';
+// Temporary in-modal assignments. Nothing is written to the database until
+// the user presses "Save All Visits".
+let bulkAssignments={};
+let bulkAssignmentNames={};
+
+function normalizeBulkPlace_(value){ return String(value||'').trim().replace(/\s+/g,' '); }
+function getBulkPlace(){
+  const selected=document.getElementById('bulkPlaceSelect').value;
+  const manual=document.getElementById('bulkPlaceManual').value.trim();
+  return normalizeBulkPlace_(selected && selected!=='__MANUAL__' ? selected : manual);
+}
+function placeKey_(place){ return normalizeBulkPlace_(place).toLowerCase(); }
+function datesForCurrentPlace_(){ return bulkAssignments[placeKey_(bulkSelectedPlace)] || []; }
+function allAssignedSessionDates_(){
+  const out={};
+  Object.keys(bulkAssignments).forEach(k=>{
+    (bulkAssignments[k]||[]).forEach(d=>out[d]=k);
+  });
+  return out;
+}
+function setCurrentPlaceDatesFromUI_(){
+  if(!bulkSelectedPlace) return;
+  const key=placeKey_(bulkSelectedPlace);
+  const dates=[...document.querySelectorAll('.bulkDate:checked')].map(x=>x.value);
+  bulkAssignments[key]=dates;
+  bulkAssignmentNames[key]=bulkSelectedPlace;
+}
+function populateBulkPlaceDropdown(selected){
+  const sel=document.getElementById('bulkPlaceSelect');
+  sel.innerHTML='<option value="">Select Place</option>'+
+    predefinedPlaces.map(p=>`<option value="${escAttr(p)}">${esc(p)}</option>`).join('')+
+    '<option value="__MANUAL__">✎ Manual / Other Place</option>';
+  sel.value='';
+  document.getElementById('bulkPlaceManual').value=selected||'';
+  bulkSelectedPlace=selected||'';
+}
+function clearBulkSelectionOnly(){
+  if(bulkSelectedPlace) bulkAssignments[placeKey_(bulkSelectedPlace)]=[];
+  document.querySelectorAll('.bulkDate:not(:disabled)').forEach(x=>{
+    x.checked=false;
+    const item=x.closest('.dateItem'); if(item) item.classList.remove('selected');
+  });
+  updateBulkSelectedCount();
+  renderBulkAssignmentSummary_();
+  renderBulkPlaceChips_();
+}
+function loadPlaceSelectionIntoUI_(){
+  const selected=new Set(datesForCurrentPlace_());
+  document.querySelectorAll('.bulkDate').forEach(x=>{
+    const checked=selected.has(x.value);
+    x.checked=checked;
+    const item=x.closest('.dateItem'); if(item) item.classList.toggle('selected',checked);
+  });
+  updateBulkSelectedCount();
+}
+function bulkPlaceChanged(){
+  // Preserve the dates selected for the place we are leaving.
+  setCurrentPlaceDatesFromUI_();
+  const sel=document.getElementById('bulkPlaceSelect');
+  if(sel.value==='__MANUAL__') document.getElementById('bulkPlaceManual').focus();
+  else if(sel.value) document.getElementById('bulkPlaceManual').value='';
+  const next=getBulkPlace();
+  bulkSelectedPlace=next;
+  if(next && !bulkAssignments[placeKey_(next)]){
+    bulkAssignments[placeKey_(next)]=[];
+    bulkAssignmentNames[placeKey_(next)]=next;
+  }
+  renderBulkDates(bulkData||{days:[]});
+  renderBulkAssignmentSummary_();
+  renderBulkPlaceChips_();
+}
+function bulkManualPlaceChanged(){
+  // Apply a manually typed place when the field is finished, not on every
+  // keystroke. This keeps the date selection stable while typing.
+  const next=getBulkPlace();
+  if(!next) return;
+  setCurrentPlaceDatesFromUI_();
+  bulkSelectedPlace=next;
+  if(!bulkAssignments[placeKey_(next)]){
+    bulkAssignments[placeKey_(next)]=[];
+    bulkAssignmentNames[placeKey_(next)]=next;
+  }
+  renderBulkDates(bulkData||{days:[]});
+  renderBulkAssignmentSummary_();
+  renderBulkPlaceChips_();
+}
+function addCurrentPlaceToBatch_(){
+  const next=getBulkPlace();
+  if(!next){ alert('Please select or enter a place first.'); return; }
+  setCurrentPlaceDatesFromUI_();
+  bulkSelectedPlace=next;
+  const key=placeKey_(next);
+  if(!bulkAssignments[key]) bulkAssignments[key]=[];
+  bulkAssignmentNames[key]=next;
+  renderBulkDates(bulkData||{days:[]});
+  renderBulkPlaceChips_();
+  renderBulkAssignmentSummary_();
+}
+function chooseBatchPlace_(key){
+  setCurrentPlaceDatesFromUI_();
+  const place=bulkAssignmentNames[key]||key;
+  bulkSelectedPlace=place;
+  const sel=document.getElementById('bulkPlaceSelect');
+  const found=predefinedPlaces.find(p=>placeKey_(p)===key);
+  if(found){ sel.value=found; document.getElementById('bulkPlaceManual').value=''; }
+  else { sel.value='__MANUAL__'; document.getElementById('bulkPlaceManual').value=place; }
+  renderBulkDates(bulkData||{days:[]});
+  renderBulkPlaceChips_();
+  renderBulkAssignmentSummary_();
+}
+function closeBulkVisit(){ hideModal('bulkModal'); }
+function renderBulkDates(data){
+  bulkData=data;
+  const currentKey=placeKey_(bulkSelectedPlace);
+  const currentDates=new Set(currentKey ? (bulkAssignments[currentKey]||[]) : []);
+  const sessionOccupied=allAssignedSessionDates_();
+  const days=data.days||[];
+  let html='';
+  const first=days.length?new Date(days[0].date+'T00:00:00'):null;
+  const leading=first?first.getDay():0;
+  for(let i=0;i<leading;i++) html+='<div class="calendarDay blank"></div>';
+  days.forEach(r=>{
+    const holiday=!!r.isHoliday;
+    const dbOccupied=!holiday && !!r.place;
+    const assignedToOtherSession=!holiday && !dbOccupied && sessionOccupied[r.date] && sessionOccupied[r.date]!==currentKey;
+    const disabled=holiday||dbOccupied||!bulkSelectedPlace;
+    const checked=!disabled && currentDates.has(r.date);
+    let cls='calendarDay';
+    if(holiday) cls+=' holidayItem';
+    else if(dbOccupied) cls+=' occupiedItem';
+    else if(checked) cls+=' selected';
+    const dow=String(r.day||'').slice(0,3);
+    let placeText='';
+    if(dbOccupied){
+      placeText=`<span class="calPlace" title="${escAttr(r.place)}">${esc(r.place)}</span><button type="button" class="calEdit" onclick='event.stopPropagation();openBulkExistingEdit_(${JSON.stringify(r.date)},${JSON.stringify(r.place||"")},${JSON.stringify(r.remarks||"")})'>Edit</button>`;
+    }else if(holiday){
+      placeText=`<span class="calPlace">${esc(r.holidayReason||'Holiday')}</span>`;
+    }else if(assignedToOtherSession){
+      const assignedPlace=bulkAssignmentNames[sessionOccupied[r.date]]||sessionOccupied[r.date];
+      placeText=`<span class="calPlace" title="${escAttr(assignedPlace)}">${esc(assignedPlace)}</span>`;
+    }
+    const checkbox=!holiday&&!dbOccupied&&!assignedToOtherSession&&bulkSelectedPlace
+      ? `<input type="checkbox" class="calCheck bulkDate" value="${r.date}" ${checked?'checked':''} onchange="event.stopPropagation();updateBulkSelectionUI(this)">` : '';
+    html+=`<div class="${cls}" data-date="${r.date}" onclick="calendarDayClick_(this)"><span class="calNum">${r.dayNumber}</span><span class="calDow">${esc(dow)}</span>${placeText}${checkbox}</div>`;
+  });
+  document.getElementById('bulkDates').innerHTML=html || '<div class="loading" style="grid-column:1/-1">No dates available.</div>';
+  updateBulkSelectedCount();
+  renderBulkAssignmentSummary_();
+  renderBulkPlaceChips_();
+}
+function calendarDayClick_(el){
+  const cb=el.querySelector('.bulkDate');
+  if(cb && !cb.disabled){ cb.checked=!cb.checked; updateBulkSelectionUI(cb); }
+}
+function updateBulkSelectionUI(cb){
+  if(!bulkSelectedPlace){ cb.checked=false; return; }
+  const date=cb.value;
+  const currentKey=placeKey_(bulkSelectedPlace);
+  Object.keys(bulkAssignments).forEach(k=>{
+    if(k!==currentKey) bulkAssignments[k]=(bulkAssignments[k]||[]).filter(d=>d!==date);
+  });
+  const current=new Set(bulkAssignments[currentKey]||[]);
+  if(cb.checked) current.add(date); else current.delete(date);
+  bulkAssignments[currentKey]=[...current];
+  bulkAssignmentNames[currentKey]=bulkSelectedPlace;
+  const item=cb.closest('.dateItem');
+  if(item) item.classList.toggle('selected',cb.checked);
+  updateBulkSelectedCount();
+  renderBulkAssignmentSummary_();
+  renderBulkPlaceChips_();
+}
+function updateBulkSelectedCount(){
+  const count=datesForCurrentPlace_().length;
+  const total=Object.values(bulkAssignments).reduce((n,a)=>n+(a||[]).length,0);
+  const el=document.getElementById('bulkSelectedCount'); if(el) el.textContent=count+' selected';
+  const hint=document.getElementById('bulkSelectionHint');
+  if(hint) hint.textContent=count===0
+    ? 'No dates selected for this place. Change place anytime; your other selections remain.'
+    : count===1 ? '1 date selected for '+(bulkSelectedPlace||'this place')+'. You can now change the place and continue.'
+    : count+' dates selected for '+(bulkSelectedPlace||'this place')+'. Change the place and continue.';
+  const save=document.querySelector('#bulkModal .primaryAction');
+  if(save) save.textContent=total ? `Save All Visits (${total})` : 'Save All Visits';
+}
+function selectAllBulkDates(){
+  if(!bulkSelectedPlace){ alert('Please select a place first.'); return; }
+  const arr=[...document.querySelectorAll('.bulkDate:not(:disabled)')].map(x=>x.value);
+  const key=placeKey_(bulkSelectedPlace);
+  Object.keys(bulkAssignments).forEach(k=>{ if(k!==key) bulkAssignments[k]=(bulkAssignments[k]||[]).filter(d=>!arr.includes(d)); });
+  bulkAssignments[key]=arr; bulkAssignmentNames[key]=bulkSelectedPlace;
+  renderBulkDates(bulkData);
+}
+function clearBulkDates(){
+  if(bulkSelectedPlace) bulkAssignments[placeKey_(bulkSelectedPlace)]=[];
+  renderBulkDates(bulkData);
+}
+function renderBulkPlaceChips_(){
+  const el=document.getElementById('bulkPlaceChips'); if(!el) return;
+  const entries=Object.entries(bulkAssignments).filter(([,ds])=>(ds||[]).length);
+  if(!entries.length){ el.innerHTML=''; return; }
+  el.innerHTML=entries.map(([k,ds])=>{
+    const label=bulkAssignmentNames[k]||k;
+    return `<button type="button" class="batchPlaceChip ${placeKey_(bulkSelectedPlace)===k?'active':''}" onclick="chooseBatchPlace_(${JSON.stringify(k)})">${esc(label)} <b>${ds.length}</b></button>`;
+  }).join('');
+}
+function renderBulkAssignmentSummary_(){
+  const el=document.getElementById('bulkAssignmentSummary'); if(!el) return;
+  const entries=Object.entries(bulkAssignments).filter(([,ds])=>(ds||[]).length);
+  if(!entries.length){ el.innerHTML=''; return; }
+  el.innerHTML='<div class="assignmentTitle">Current batch — nothing saved yet</div>'+entries.map(([k,ds])=>{
+    const label=bulkAssignmentNames[k]||k;
+    const dates=ds.slice().sort().map(d=>d.slice(8)).join(', ');
+    return `<div class="assignmentRow"><span>${esc(label)} <small style="color:#7a8798">(${dates})</small></span><b>${ds.length}</b></div>`;
+  }).join('');
+}
+function clearAllSavedVisits_(){
+  const y=+document.getElementById('year').value;
+  const m=+document.getElementById('month').value;
+  const monthName=document.getElementById('month').selectedOptions[0]?.text || '';
+  const ok=confirm('Do you want to clear all the sections?\n\nThis will permanently remove all SAVED VISITS for '+monthName+' '+y+'. Holidays and counters will not be deleted.\n\nThis action cannot be undone.');
+  if(!ok) return;
+  const btn=document.querySelector('.clearSavedBtn');
+  if(btn){btn.disabled=true;btn.textContent='Clearing Saved Visits...';}
+  google.script.run.withSuccessHandler(res=>{
+    if(btn){btn.disabled=false;btn.textContent='🗑 Clear All Saved Visits (This Month)';}
+    const data=res && res.data ? res.data : res;
+    monthCache[y+'-'+m]=data;
+    render(data);
+    if(document.getElementById('bulkModal').classList.contains('open')){
+      bulkData=data;
+      bulkAssignments={}; bulkAssignmentNames={}; bulkSelectedPlace='';
+      const sel=document.getElementById('bulkPlaceSelect'); if(sel) sel.value='';
+      const man=document.getElementById('bulkPlaceManual'); if(man) man.value='';
+      renderBulkDates(data);
+    }
+    alert((res && res.removed ? res.removed : 0)+' saved visit(s) cleared for '+monthName+' '+y+'.');
+  }).withFailureHandler(e=>{
+    if(btn){btn.disabled=false;btn.textContent='🗑 Clear All Saved Visits (This Month)';}
+    alert('Could not clear saved visits: '+e.message);
+  }).clearAllSavedVisits(y,m);
+}
+
+function clearAllBulkAssignments_(){
+  const total=Object.values(bulkAssignments).reduce((n,a)=>n+(a||[]).length,0);
+  if(!total){ alert('There are no selected visits to clear.'); return; }
+  const ok=confirm('Do you want to clear all the sections?\n\nThis will remove all places and dates selected in this Multi-Date Visit window.');
+  if(!ok) return;
+  bulkAssignments={};
+  bulkAssignmentNames={};
+  bulkSelectedPlace='';
+  const sel=document.getElementById('bulkPlaceSelect'); if(sel) sel.value='';
+  const man=document.getElementById('bulkPlaceManual'); if(man) man.value='';
+  renderBulkDates(bulkData||{days:[]});
+}
+
+function saveBulkVisit(){
+  setCurrentPlaceDatesFromUI_();
+  const remarks=document.getElementById('bulkRemarks').value.trim();
+  const assignments=Object.entries(bulkAssignments)
+    .filter(([,dates])=>(dates||[]).length)
+    .map(([key,dates])=>({place:bulkAssignmentNames[key]||key,dates:dates.slice()}));
+  if(!assignments.length){ alert('Please select at least one place and date.'); return; }
+  const btn=document.querySelector('#bulkModal .primaryAction'); btn.disabled=true; btn.textContent='Saving All...';
+  google.script.run.withSuccessHandler(data=>{
+    btn.disabled=false; btn.textContent='Save All Visits';
+    monthCache[data.year+'-'+data.month]=data; closeBulkVisit(); render(data);
+  }).withFailureHandler(e=>{
+    btn.disabled=false; updateBulkSelectedCount(); alert('Could not save visits: '+e.message);
+  }).saveVisitsBulk({assignments:assignments,remarks:remarks});
+}
+
+
+function populatePlaceDropdown(selectedPlace){
+  const sel=document.getElementById('placeSelect');
+  sel.innerHTML='<option value="">Select Place</option>' +
+    predefinedPlaces.map(p=>`<option value="${escAttr(p)}">${esc(p)}</option>`).join('') +
+    '<option value="__MANUAL__">✎ Manual / Other Place</option>';
+
+  const found=predefinedPlaces.find(p=>p.toLowerCase()===String(selectedPlace||'').toLowerCase());
+  if(found){
+    sel.value=found;
+    document.getElementById('placeManual').value='';
+  }else if(selectedPlace){
+    sel.value='__MANUAL__';
+    document.getElementById('placeManual').value=selectedPlace;
+  }else{
+    sel.value='';
+    document.getElementById('placeManual').value='';
+  }
+}
+
+function placeSelectChanged(){
+  const sel=document.getElementById('placeSelect');
+  const manual=document.getElementById('placeManual');
+  if(sel.value==='__MANUAL__'){
+    manual.focus();
+  }else if(sel.value){
+    manual.value='';
+  }
+}
+
+function setTopProfileUI_(profile){
+  const n=document.getElementById('topNameInput'), e=document.getElementById('topEmployeeIdInput');
+  if(n) n.value=profile.name||'SURAJ';
+  if(e) e.value=profile.employeeId||'';
+  const t=document.getElementById('name'); if(t) t.textContent=profile.name||'SURAJ';
+  const eid=document.getElementById('employeeIdTop'); if(eid) eid.textContent=profile.employeeId ? '• ID: '+profile.employeeId : '';
+}
+function saveInlineProfile_(){
+  clearTimeout(inlineProfileTimer_);
+  inlineProfileTimer_=setTimeout(()=>saveInlineProfileNow_(),220);
+}
+function saveInlineProfileNow_(){
+  const n=document.getElementById('topNameInput'), e=document.getElementById('topEmployeeIdInput');
+  if(!n||!e) return;
+  const name=(n.value||'').trim()||'SURAJ', employeeId=(e.value||'').trim();
+  const state=document.getElementById('profileSaveState'); if(state) state.textContent='Saving…';
+  google.script.run.withSuccessHandler(profile=>{
+    setTopProfileUI_(profile);
+    const key=+document.getElementById('year').value+'-'+(+document.getElementById('month').value);
+    if(monthCache[key]){ monthCache[key].name=profile.name; monthCache[key].employeeId=profile.employeeId; monthCache[key].summary.name=profile.name; monthCache[key].summary.employeeId=profile.employeeId; }
+    if(state){state.textContent='Saved'; setTimeout(()=>{if(state)state.textContent='';},900);}
+  }).withFailureHandler(()=>{if(state)state.textContent='';}).saveProfile({name,employeeId});
+}
+
+function openProfile(){
+  google.script.run.withSuccessHandler(profile=>{
+    document.getElementById('profileName').value=profile.name||'SURAJ';
+    document.getElementById('profileEmployeeId').value=profile.employeeId||'';
+    showModal('profileModal');
+    setTimeout(()=>document.getElementById('profileName').focus(),100);
+  }).withFailureHandler(e=>alert('Could not load profile: '+e.message)).getProfile();
+}
+function closeProfile(){hideModal('profileModal')}
+function saveProfile(){
+  const name=document.getElementById('profileName').value.trim();
+  const employeeId=document.getElementById('profileEmployeeId').value.trim();
+  if(!name){alert('Please enter a name.');return;}
+  const btn=document.querySelector('#profileModal .primaryAction');
+  btn.disabled=true; btn.textContent='Saving...';
+  google.script.run.withSuccessHandler(profile=>{
+    btn.disabled=false; btn.textContent='Save Profile';
+    setTopProfileUI_(profile);
+    closeProfile();
+    const key=+document.getElementById('year').value+'-'+(+document.getElementById('month').value);
+    if(monthCache[key]){ monthCache[key].name=profile.name||'SURAJ'; monthCache[key].employeeId=profile.employeeId||''; monthCache[key].summary.name=profile.name||'SURAJ'; monthCache[key].summary.employeeId=profile.employeeId||''; render(monthCache[key]); }
+  }).withFailureHandler(e=>{btn.disabled=false;btn.textContent='Save Profile';alert('Could not save profile: '+e.message);}).saveProfile({name,employeeId});
+}
+function openBulkExistingEdit_(date,place,remarks){
+  closeBulkVisit();
+  setTimeout(()=>openVisit(date,place,remarks),120);
+}
+
+function openVisit(date,place,remarks){
+  selectedVisitDate=date;
+  document.getElementById('visitDate').textContent='Date: '+date;
+  populatePlaceDropdown(place||'');
+  document.getElementById('remarks').value=remarks||'';
+  showModal('visitModal');
+  setTimeout(()=>document.getElementById('placeSelect').focus(),100);
+}
+function closeVisit(){hideModal('visitModal')}
+
+function saveVisit(){
+  const selected=document.getElementById('placeSelect').value;
+  const manual=document.getElementById('placeManual').value.trim();
+  const place = selected && selected!=='__MANUAL__' ? selected : manual;
+  const remarks=document.getElementById('remarks').value.trim();
+
+  if(!place){
+    alert('Please select a place or enter a manual place name.');
+    return;
+  }
+
+  google.script.run.withSuccessHandler(data=>{
+      closeVisit();
+      monthCache[data.year+'-'+data.month]=data;
+      render(data);
+    })
+    .withFailureHandler(e=>alert(e.message))
+    .saveVisit({date:selectedVisitDate,place,remarks});
+}
+
+function openHoliday(date){
+  selectedHolidayDate=date;
+  document.getElementById('holidayDate').textContent='Date: '+date;
+  document.getElementById('reason').value='';
+  showModal('holidayModal');
+  setTimeout(()=>document.getElementById('reason').focus(),100);
+}
+function closeHoliday(){hideModal('holidayModal')}
+function confirmHoliday(){
+  const reason=document.getElementById('reason').value.trim()||'Holiday';
+  google.script.run.withSuccessHandler(data=>{
+      closeHoliday();
+      monthCache[data.year+'-'+data.month]=data;
+      render(data);
+    })
+    .withFailureHandler(e=>alert(e.message))
+    .markHoliday({date:selectedHolidayDate,reason});
+}
+function unholiday(date){
+  if(confirm('Remove this holiday and make it a working day?')){
+    google.script.run.withSuccessHandler(data=>{
+      monthCache[data.year+'-'+data.month]=data;
+      render(data);
+    }).withFailureHandler(e=>alert(e.message)).unmarkHoliday({date});
+  }
+}
+function showSummary(s){
+  total.textContent=s.totalDays;
+  working.textContent=s.workingDays;
+  holidays.textContent=s.holidayDays;
+  visits.textContent=s.visitDays;
+
+  summary.innerHTML=s.places.map(x=>`
+    <tr>
+      <td><b>${esc(x.place)}</b></td>
+      <td><b>${x.days}</b></td>
+      <td>
+        <input type="number" min="0" inputmode="numeric"
+          value="${x.counter||0}"
+          style="width:90px;padding:7px"
+          onchange="saveCounter('${escJs(x.place)}',this.value)">
+      </td>
+    </tr>`).join('') ||
+    '<tr><td colspan="3">No visits entered</td></tr>';
+}
+function saveCounter(place,counter){
+  const y=+document.getElementById('year').value;
+  const m=+document.getElementById('month').value;
+  google.script.run
+    .withSuccessHandler(data=>{
+      monthCache[data.year+'-'+data.month]=data;
+      showSummary(data.summary);
+    })
+    .withFailureHandler(e=>alert(e.message))
+    .saveCounter({year:y,month:m,place:place,counter:Number(counter||0)});
+}
+function escJs(s){
+  return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+}
+
+function exportXlsx(){
+  const y=+document.getElementById('year').value;
+  const m=+document.getElementById('month').value;
+  const btn=document.querySelector('.toolbar button:last-child');
+  const old=btn.textContent;
+  btn.textContent='Preparing Excel...';
+  btn.disabled=true;
+
+  google.script.run
+    .withSuccessHandler(o=>{
+      btn.textContent=old;
+      btn.disabled=false;
+      const w=window.open(o.downloadUrl,'_blank');
+      if(!w){
+        alert('Excel is ready. Please allow pop-ups and use this link: '+o.fileUrl);
+      }
+    })
+    .withFailureHandler(e=>{
+      btn.textContent=old;
+      btn.disabled=false;
+      alert('Excel export failed: '+e.message);
+    })
+    .exportMonthXlsx(y,m);
+}
+
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function escAttr(s){return esc(s).replace(/`/g,'&#096;')}
+init();
+</script>
+</body>
+</html>
